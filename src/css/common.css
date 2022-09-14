@@ -26,3 +26,17 @@ body > div {
   display: flex;
   gap: 15px;
 }
+
+body > div > div {
+  padding: 5px 15px;
+  border: 5px solid rgb(98, 139, 200);
+  outline: 1px solid black;
+  text-align: center;
+  background-color: rgb(216, 225, 240);
+}
+
+.value {
+  font-size: 30px;
+  font-weight: 600;
+  border-bottom: 1px solid black;
+}
