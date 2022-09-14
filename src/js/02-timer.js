@@ -43,7 +43,7 @@ function coundown(time) {
     let coundownData = convertMs(time);
     updateTimerElems(coundownData);
 
-    if (time < 999) {
+    if (time < 1000) {
       clearInterval(coundownTimer);
       switchInpDisable(false);
     }

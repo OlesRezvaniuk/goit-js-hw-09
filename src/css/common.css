@@ -33,6 +33,8 @@ body > div > div {
   outline: 1px solid black;
   text-align: center;
   background-color: rgb(216, 225, 240);
+  display: flex;
+  flex-direction: column;
 }
 
 .value {
