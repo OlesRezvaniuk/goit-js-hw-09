@@ -13,6 +13,8 @@ const timerHours = document.querySelector('span[data-hours]');
 const timeMinutes = document.querySelector('span[data-minutes]');
 const timerseconds = document.querySelector('span[data-seconds]');
 
+timerStartBtn.disabled = true;
+
 let myCalendar = flatpickr('#datetime-picker', {
   enableTime: true,
   time_24hr: true,
