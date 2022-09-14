@@ -1,74 +1,60 @@
+// const flatpickr = require("flatpickr");
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+require('flatpickr/dist/themes/confetti.css');
+
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const refs = {
-  dateTimePicker: document.querySelector('input#datetime-picker'),
-  dateTimePickerButton: document.querySelector('button[data-start]'),
-  dataDays: document.querySelector('span[data-days]'),
-  dataHours: document.querySelector('span[data-hours]'),
-  dataMinutes: document.querySelector('span[data-minutes]'),
-  dataSeconds: document.querySelector('span[data-seconds]'),
-  boxTimer: document.querySelector('.timer'),
-  boxFields: document.querySelectorAll('.field'),
-  boxValue: document.querySelectorAll('.value'),
-  boxLabel: document.querySelectorAll('.label'),
-};
+const timerStartBtn = document.querySelector('button[data-start]');
+const calendarInput = document.querySelector('#datetime-picker');
 
-refs.dateTimePickerButton.disabled = true;
-refs.boxTimer.style.display = 'flex';
-refs.boxTimer.style.gap = '20px';
+const timerDays = document.querySelector('span[data-days]');
+const timerHours = document.querySelector('span[data-hours]');
+const timeMinutes = document.querySelector('span[data-minutes]');
+const timerseconds = document.querySelector('span[data-seconds]');
 
-for (let i = 0; i < refs.boxFields.length; i += 1) {
-  refs.boxFields[i].style.display = 'flex';
-  refs.boxFields[i].style.flexDirection = 'column';
-  refs.boxFields[i].style.alignItems = 'center';
-  refs.boxValue[i].style.fontSize = '20px';
-  refs.boxValue[i].style.color = 'red';
-  refs.boxValue[i].style.fontWeight = 'bold';
-  refs.boxLabel[i].style.fontSize = '10px';
-  refs.boxLabel[i].style.color = 'blueviolet';
-  refs.boxLabel[i].style.fontWeight = 'bold';
-}
-
-let timerId = null;
-
-refs.dateTimePickerButton.addEventListener('click', commenceTimer);
-
-const options = {
+let myCalendar = flatpickr('#datetime-picker', {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    if (selectedDates) {
-      if (selectedDates[0] < options.defaultDate) {
-        refs.dateTimePickerButton.disabled = true;
-        Notify.failure('Please choose a date in the future');
-      } else {
-        refs.dateTimePickerButton.removeAttribute('disabled');
-        const convertedSelectedDate = selectedDates[0].getTime();
-        localStorage.setItem('selectedDate', convertedSelectedDate);
-      }
+    let counterValue = selectedDates[0].getTime();
+
+    if (counterValue < new Date()) {
+      timerStartBtn.disabled = true;
+      Notify.failure('Please choose a date in the future', { width: '280px' });
+    } else {
+      timerStartBtn.disabled = false;
     }
   },
-};
+});
 
-flatpickr(refs.dateTimePicker, options);
+timerStartBtn.addEventListener('click', () =>
+  coundown(myCalendar.selectedDates[0] - new Date())
+);
 
-function commenceTimer() {
-  timerId = setInterval(() => {
-    refs.dateTimePickerButton.disabled = true;
-    const choosenDateTime = Number(localStorage.getItem('selectedDate'));
-    const actualDateTime = Date.now();
-    const timeDifferance = choosenDateTime - actualDateTime;
+function coundown(time) {
+  switchInpDisable(true);
 
-    timeConverter(convertMs(timeDifferance));
+  const coundownTimer = setInterval(() => {
+    time -= 1000;
+
+    let coundownData = convertMs(time);
+    updateTimerElems(coundownData);
+
+    if (time < 999) {
+      clearInterval(coundownTimer);
+      switchInpDisable(false);
+    }
   }, 1000);
 }
 
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
+function updateTimerElems(delay) {
+  timerDays.textContent = delay.days;
+  timerHours.textContent = delay.hours;
+  timeMinutes.textContent = delay.minutes;
+  timerseconds.textContent = delay.seconds;
 }
 
 function convertMs(ms) {
@@ -92,14 +78,11 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-function timeConverter({ days, hours, minutes, seconds }) {
-  refs.dataDays.textContent = days;
-  refs.dataHours.textContent = hours;
-  refs.dataMinutes.textContent = minutes;
-  refs.dataSeconds.textContent = seconds;
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
 
-  if (days === '00' && hours === '00' && minutes === '00' && seconds === '00') {
-    clearInterval(timerId);
-    refs.dateTimePickerButton.removeAttribute('disabled');
-  }
+function switchInpDisable(value) {
+  timerStartBtn.disabled = value;
+  calendarInput.disabled = value;
 }
